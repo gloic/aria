@@ -1,57 +1,38 @@
-import os
-import warnings
-from TTS.utils.generic_utils import get_user_data_dir
-from TTS.utils.manage import ModelManager
-from TTS.tts.configs.xtts_config import XttsConfig
-from TTS.tts.models.xtts import Xtts
+import requests
+import numpy as np
+import io
+import soundfile as sf  # Vous aurez besoin de cette bibliothèque pour lire les fichiers audio
 
 
 class Tts:
     def __init__(self, params=None, ap=None):
         self.params = params or {}
-        self.device = self.params.get('device', None)
-        self.use_deepspeed = self.params.get('use_deepspeed', None)
-        self.text_splitting = self.params.get('text_splitting', None)
-        self.model_name = self.params.get('model_name', None)
-        self.force_reload = self.params.get('force_reload', None)
-        self.verbose = self.params.get('verbose', None)
-        self.voice_to_clone = self.params.get('assets', None).get('voice_to_clone', None)
-        
+        self.api_url = self.params.get('api_url', 'http://localhost:8020/tts_stream')
+        self.language = self.params.get('language', 'fr')
+        self.voice_to_clone = self.params.get('assets', {}).get('voice_to_clone')
         self.ap = ap
-        
-        if not self.verbose:
-            warnings.filterwarnings("ignore", module="TTS")
+        self.device = self.params.get('device', None)
 
-        self.model_path = os.path.join(get_user_data_dir("tts"), self.model_name.replace('/', '--'))
-        if self.force_reload or not os.path.isdir(self.model_path):
-            self.model_manager = ModelManager(verbose=self.verbose)
-            self.model_path, _, _ = self.model_manager.download_model(self.model_name)  
-            
-        self.config = XttsConfig()
-        self.config.load_json(os.path.join(self.model_path, 'config.json'))
-        self.model = Xtts.init_from_config(self.config)
-        self.model.load_checkpoint(self.config, 
-                            checkpoint_dir=self.model_path, 
-                            use_deepspeed=self.use_deepspeed)
-        if self.device == 'gpu':
-            self.model.cuda()
+    def run_tts(self, nw, data):
+        if not all(char.isspace() for char in data):
+            params = {
+                'text': data,
+                'speaker_wav': self.voice_to_clone,
+                'language': self.language
+            }
+            response = requests.get(self.api_url, params=params, stream=True)
 
-        self.gpt_cond_latent, self.speaker_embedding = self.model.get_conditioning_latents(
-                audio_path=[self.voice_to_clone]
-            )
-    
-    def run_tts(self, data):
-        tts_stream = self.model.inference_stream(
-                data,
-                "en",
-                self.gpt_cond_latent,
-                self.speaker_embedding,
-                enable_text_splitting=self.text_splitting
-            )
-        for chunk in tts_stream:
-            chunk = chunk.squeeze()
+            audio_data = bytearray()
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    audio_data.extend(chunk)
+            audio_array, sample_rate = sf.read(io.BytesIO(audio_data))
+
             if self.device == 'gpu':
-                chunk = chunk.cpu()
-            self.ap.stream_sound(chunk.numpy(), update_ui=True)
+                audio_array = np.ascontiguousarray(audio_array)
+            else:
+                audio_array = np.asarray(audio_array)
 
-        return 'tts_done'  
+            self.ap.stream_sound(audio_array, update_ui=True)
+
+        return 'tts_done'

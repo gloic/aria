@@ -4,7 +4,7 @@ torch==2.2.1
 torchaudio==2.2.1
 torchvision==0.17.1
 onnxruntime==1.17.1
-transformers==4.44.0
+transformers==4.40.0
 flash-attn==2.5.6
 deepspeed==0.14.0
 soundfile==0.12.1
