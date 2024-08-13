@@ -2,39 +2,31 @@ from openai import OpenAI
 
 from .utils import remove_emojis
 
+
 class Llm:
     def __init__(self, params=None):
         self.params = params or {}
-        self.model_name = self.params.get('model_name', None)
-        self.model_file = self.params.get('model_file', None)
-        self.num_gpu_layers = self.params.get('num_gpu_layers', None)
         self.context_length = self.params.get('context_length', None)
         self.streaming_output = self.params.get('streaming_output', None)
         self.chat_format = self.params.get('chat_format', None)
         self.system_message = self.params.get('system_message', None)
         self.verbose = self.params.get('verbose', None)
-       
-        self.llm = OpenAI(base_url="http://127.0.0.1:5000/v1", api_key="BALEK")
-        self.messages = [
-                {
-                    "role": "system", 
-                    "content": self.system_message
-                }
-            ]
+        self.base_url = self.params.get('base_url', None)
+        self.api_key = self.params.get('api_key', None)
+
+        self.llm = OpenAI(base_url=self.base_url,
+                          api_key=self.api_key)
+
+        self.messages = [{"role": "system", "content": self.system_message}]
 
     def get_answer(self, nw, tts, data):
-        self.messages.append(
-            {
-                "role": "user", 
-                "content": data
-            }
-        )
+        self.messages.append({"role": "user", "content": data})
 
         outputs = self.llm.chat.completions.create(
             model="osef",
             messages=self.messages,
-            stream=self.streaming_output
-            )
+            stream=self.streaming_output  # CPT
+        )
 
         if self.streaming_output:
             llm_output = ""
@@ -100,11 +92,6 @@ class Llm:
         else:
             llm_output = outputs.choices[0].message.content.strip()
 
-        self.messages.append(
-            {
-                "role": "assistant", 
-                "content": llm_output
-            }
-        )
-        
+        self.messages.append({"role": "assistant", "content": llm_output})
+
         return llm_output

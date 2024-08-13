@@ -25,26 +25,25 @@
         "model_name": "openai/whisper-large-v3",
         "low_cpu_mem_usage": true,
         "attn": "flash_attention_2",
-        "verbose": false
+        "verbose": false,
+        "language": "fr"
       }
     },
     "Llm": {
       "params": {
-        "model_name": "TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF",
-        "model_file": "mixtral-8x7b-instruct-v0.1.Q2_K.gguf",
-        "num_gpu_layers": -1,
-        "context_length": 8000,
+        "context_length": 8192,
         "streaming_output": false,
         "chat_format": "llama-2",
         "system_message": "You are Aria an AI entity. You are rude, sarcastic and funny. Please aim for concise responses, limiting them to a maximum of 20 words whenever possible. Please do not suggest for further assistance or help.",
         "verbose": true,
-        "base_url": "http://127.0.0.1:5000/api/v1"
+        "base_url": "http://127.0.0.1:5000/api/v1",
+        "api_key": "osef"
       }
     },
     "Tts": {
       "params": {
         "device": "gpu",
-        "use_deepspeed": true,
+        "use_deepspeed": false,
         "text_splitting": false,
         "model_path": "/xtts-api-server/xtts_models/v2.0.2",
         "model_name": "tts_models/multilingual/multi-dataset/xtts_v2",
@@ -52,7 +51,9 @@
         "verbose": false,
         "assets": {
             "voice_to_clone": "assets/female_06.wav"
-        }
+        },
+        "api_url": "http://localhost:8020/tts_stream",
+        "language": "fr"
       }
     },
     "Ap": {

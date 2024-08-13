@@ -1,5 +1,7 @@
 import sys
+
 from openai import OpenAI
+
 from .utils import remove_emojis
 
 
@@ -14,32 +16,24 @@ class Llm:
         self.chat_format = self.params.get('chat_format', None)
         self.system_message = self.params.get('system_message', None)
         self.verbose = self.params.get('verbose', None)
-       
+        self.base_url = self.params.get('base_url', None)
+        self.api_key = self.params.get('api_key', None)
+
         self.llm = OpenAI(
-            api_key="BALEK",
-            base_url="http://127.0.0.1:5000/api/v1"
+            api_key=self.api_key,
+            base_url=self.base_url
         )
 
-        self.messages = [
-                {
-                    "role": "system", 
-                    "content": self.system_message
-                }
-            ]
+        self.messages = [{"role": "system", "content": self.system_message}]
 
     def get_answer(self, ui, ap, tts, data):
-        self.messages.append(
-            {
-                "role": "user", 
-                "content": data
-            }
-        )
-    
+        self.messages.append({"role": "user", "content": data})
+
         outputs = self.llm.chat.completions.create(
             messages=self.messages,
-            stream=False # self.streaming_output - CPT
-            )
-        
+            stream=self.streaming_output # CPT
+        )
+
         if self.streaming_output:
             llm_output = ""
             tts_text_buffer = []
@@ -89,11 +83,6 @@ class Llm:
         else:
             llm_output = outputs.choices[0].message.content.strip()
 
-        self.messages.append(
-            {
-                "role": "assistant", 
-                "content": llm_output
-            }
-        )
-        
+        self.messages.append({"role": "assistant", "content": llm_output})
+
         return llm_output

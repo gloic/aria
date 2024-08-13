@@ -12,6 +12,7 @@ class Stt:
         self.low_cpu_mem_usage = self.params.get('low_cpu_mem_usage', None)
         self.attn = self.params.get('attn', None)
         self.verbose = self.params.get('verbose', None)
+        self.language = self.params.get('language', None)
         
         if not self.verbose:
             transformers.logging.set_verbosity_error()
@@ -47,7 +48,7 @@ class Stt:
     def transcribe_translate(self, data):
         data = self.pipe(
             data,
-            generate_kwargs={"language": "en"}
+            generate_kwargs={"language": self.language}
         )
         data = data["text"][1:]
         return data

@@ -1,14 +1,14 @@
 import requests
 import numpy as np
 import io
-import soundfile as sf  # Vous aurez besoin de cette bibliothèque pour lire les fichiers audio
+import soundfile as sf
 
 
 class Tts:
     def __init__(self, params=None, ap=None):
         self.params = params or {}
-        self.api_url = self.params.get('api_url', 'http://localhost:8020/tts_stream')
-        self.language = self.params.get('language', 'fr')
+        self.api_url = self.params.get('api_url', None)
+        self.language = self.params.get('language', None)
         self.voice_to_clone = self.params.get('assets', {}).get('voice_to_clone')
         self.ap = ap
         self.device = self.params.get('device', None)
