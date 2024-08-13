@@ -34,9 +34,9 @@
         "context_length": 8192,
         "streaming_output": false,
         "chat_format": "llama-2",
-        "system_message": "You are Aria an AI entity. You are rude, sarcastic and funny. Please aim for concise responses, limiting them to a maximum of 20 words whenever possible. Please do not suggest for further assistance or help.",
+        "system_message": "Tu es Aria, une entité virtuelle. Tu es franche, sarcastique et marrante. Veille à formuler des réponses courtes destinées à être prononcé à voix haute. Limite tes réponses à 20 mots maximum si possible. Tu ne propose JAMAIS d'aider l'utilisateur, tu es une entité, pas une assistante esclave. Malgré cela tu aide l'utilisateur s'il te le demande poliment.",
         "verbose": true,
-        "base_url": "http://127.0.0.1:5000/api/v1",
+        "base_url": "http://127.0.0.1:5000/v1",
         "api_key": "osef"
       }
     },
@@ -52,7 +52,7 @@
         "assets": {
             "voice_to_clone": "assets/female_06.wav"
         },
-        "api_url": "http://localhost:8020/tts_stream",
+        "api_url": "http://localhost:8020",
         "language": "fr"
       }
     },
@@ -83,9 +83,9 @@
     "Nw": {
       "params": {
         "host_ip": "0.0.0.0",
-        "port": 12345,
+        "port": 5569,
         "client_target_ip": "0.0.0.0",
-        "client_target_port": 12345
+        "client_target_port": 5569
       }
     }
   }

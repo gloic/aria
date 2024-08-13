@@ -30,6 +30,7 @@ class Llm:
         self.messages.append({"role": "user", "content": data})
 
         outputs = self.llm.chat.completions.create(
+            model="osef",
             messages=self.messages,
             stream=self.streaming_output # CPT
         )
