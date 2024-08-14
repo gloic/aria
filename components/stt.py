@@ -13,16 +13,16 @@ class Stt:
         self.attn = self.params.get('attn', None)
         self.verbose = self.params.get('verbose', None)
         self.language = self.params.get('language', None)
-        
+
         if not self.verbose:
             transformers.logging.set_verbosity_error()
             warnings.filterwarnings("ignore", module="transformers")
-        
+
         if self.device == "cpu":
             self.attn = "sdpa"
-            
+
         torch_dtype = torch.float16 if torch.cuda.is_available() and "cuda" in self.device else torch.float32
-        
+
         model = AutoModelForSpeechSeq2Seq.from_pretrained(
             self.model_name,
             torch_dtype=torch_dtype,
@@ -31,7 +31,7 @@ class Stt:
             attn_implementation=self.attn,
             device_map=self.device
         )
-        
+
         processor = AutoProcessor.from_pretrained(self.model_name)
         self.pipe = pipeline(
             "automatic-speech-recognition",

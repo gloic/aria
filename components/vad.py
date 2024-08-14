@@ -13,10 +13,12 @@ class Vad:
         self.no_voice_wait_sec = self.params.get('no_voice_wait_sec', None)
         self.onnx_verbose = self.params.get('onnx_verbose', None)
         self.verbose = self.params.get('verbose', None)
-        
+        self.threshold = self.params.get('threshold', None)
+        self.min_silence_ms = self.params.get('min_silence_ms', None)
+
         if self.use_onnx and not self.onnx_verbose:
             ort.set_default_logger_severity(3)
-        
+
         self.silero_vad_model, self.silero_utils = torch.hub.load(
             repo_or_dir=self.repo_or_dir,
             model=self.model_name,
@@ -25,7 +27,7 @@ class Vad:
             trust_repo='check',
             verbose=self.verbose
         )
-        
+
         (
             self.get_speech_timestamps,
             self.save_audio,
@@ -35,18 +37,18 @@ class Vad:
         ) = self.silero_utils
 
         self.no_voice_sec = 0
-        
+
         self.vad_iterator = self.VADIterator(
             self.silero_vad_model,
-            threshold=0.5,
+            threshold=self.threshold,
             sampling_rate=self.samplerate,
-            min_silence_duration_ms=100,
+            min_silence_duration_ms=self.min_silence_ms,
             speech_pad_ms=30
-            ) 
-        
+        )
+
     def reset_vad(self):
         self.no_voice_sec = 0
-        self.vad_iterator.reset_states()   
+        self.vad_iterator.reset_states()
 
     def check(self, mic_chunk, chunk_time):
         speech_dict = self.vad_iterator(mic_chunk, return_seconds=False)
@@ -58,7 +60,7 @@ class Vad:
         else:
             if self.no_voice_sec != 0:
                 self.no_voice_sec += chunk_time
-                if self.no_voice_sec > self.no_voice_wait_sec:                
+                if self.no_voice_sec > self.no_voice_wait_sec:
                     self.no_voice_sec = 0
                     self.vad_iterator.reset_states()
                     return "vad_end"

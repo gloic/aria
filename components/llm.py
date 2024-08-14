@@ -18,6 +18,9 @@ class Llm:
         self.verbose = self.params.get('verbose', None)
         self.base_url = self.params.get('base_url', None)
         self.api_key = self.params.get('api_key', None)
+        self.temperature = self.params.get('temperature', 0.6)
+        self.top_p = self.params.get('top_p', 0.9)
+        self.bot_name = self.params.get('bot_name', 'Aria')
 
         self.llm = OpenAI(
             api_key=self.api_key,
@@ -30,18 +33,21 @@ class Llm:
         self.messages.append({"role": "user", "content": data})
 
         outputs = self.llm.chat.completions.create(
-            model="osef",
+            model=self.model_name,
             messages=self.messages,
-            stream=self.streaming_output # CPT
+            stream=self.streaming_output,
+            temperature=self.temperature,
+            top_p=self.top_p
         )
 
         if self.streaming_output:
+            # CPT
             llm_output = ""
             tts_text_buffer = []
             color_code_block = False
             backticks = 0
             skip_code_block_on_tts = False
-            ui.add_message("Aria", "", new_entry=True)
+            ui.add_message(self.bot_name, "", new_entry=True)
             for i, out in enumerate(outputs):
                 if "content" in out['choices'][0]["delta"]:
                     output_chunk_txt = out['choices'][0]["delta"]['content']
@@ -54,13 +60,13 @@ class Llm:
                     else:
                         backticks = 0
                     if i == 1:
-                        print('Aria:', output_chunk_txt.strip(), end='')
+                        print(self.bot_name + ':', output_chunk_txt.strip(), end='')
                         if backticks == 0:
-                            ui.add_message("Aria", output_chunk_txt.strip(), new_entry=False, color_code_block=color_code_block)
+                            ui.add_message(self.bot_name, output_chunk_txt.strip(), new_entry=False, color_code_block=color_code_block)
                     else:
                         print(output_chunk_txt, end='')
                         if backticks == 0:
-                            ui.add_message("Aria", output_chunk_txt, new_entry=False, color_code_block=color_code_block)
+                            ui.add_message(self.bot_name, output_chunk_txt, new_entry=False, color_code_block=color_code_block)
                     sys.stdout.flush()
                     llm_output += output_chunk_txt
                     if not skip_code_block_on_tts:

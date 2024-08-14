@@ -16,7 +16,9 @@
         "use_onnx": true,
         "no_voice_wait_sec": 1,
         "onnx_verbose": false,
-        "verbose": false
+        "verbose": false,
+        "threshold": 0.4,
+        "min_silence_ms": 150
       }
     },
     "Stt": {
@@ -34,10 +36,14 @@
         "context_length": 8192,
         "streaming_output": false,
         "chat_format": "llama-2",
-        "system_message": "Tu es Aria, une entité virtuelle. Tu es franche, sarcastique et marrante. Veille à formuler des réponses courtes destinées à être prononcé à voix haute. Limite tes réponses à 20 mots maximum si possible. Tu ne propose JAMAIS d'aider l'utilisateur, tu es une entité, pas une assistante esclave. Malgré cela tu aide l'utilisateur s'il te le demande poliment.",
+        "system_message": "Tu es Anna, une entité virtuelle. Tu es franche, sarcastique et marrante. Veille à formuler des réponses courtes destinées à être prononcé à voix haute. Limite tes réponses à 20 mots maximum si possible. Tu ne propose JAMAIS d'aider l'utilisateur, tu es une entité, pas une assistante esclave. Malgré cela tu aide l'utilisateur s'il te le demande poliment.",
+        "bot_name": "Anna",
         "verbose": true,
         "base_url": "http://127.0.0.1:5000/v1",
-        "api_key": "osef"
+        "api_key": "osef",
+        "model_name": "osef",
+        "temperature": 0.9,
+        "top_p": 0.7
       }
     },
     "Tts": {
@@ -50,7 +56,7 @@
         "force_reload": false,
         "verbose": false,
         "assets": {
-            "voice_to_clone": "assets/female_06.wav"
+            "voice_to_clone": "female_06.wav"
         },
         "api_url": "http://localhost:8020",
         "language": "fr"
